@@ -45,3 +45,54 @@
 
 ## 43
 `db.empleados.updateMany({ salario: { $gt: 10000 }}, { $mul: { salario: 1.07 }})`
+
+## 52
+```mongo
+db.emps.aggregate([
+  { $match: { contrato: {$exists: true}} },
+  { $group: { _id: "$enderezo.provincia", total_fillos: {$sum: "$num_fillos"}}}
+])
+```
+## 53
+```mongo
+db.emps.aggregate([
+  { $match: { contrato: {$exists: true}} },
+  { $group: { _id: "$enderezo.provincia", total_fillos: {$sum: "$num_fillos"}}},
+  { $match: {total_fillos: {$gt: 300}}}
+])
+```
+## 54
+```mongo
+db.emps.aggregate([
+  { $match: { contrato: {$exists: true}} },
+  { $group: { _id: "$enderezo.provincia", total_fillos: {$sum: "$num_fillos"}}},
+  { $match: {total_fillos: {$gt: 300}}},
+  { $project: {_id: 0, provincia: "$_id", total_fillos: 1} }
+])
+```
+## 55
+```mongo
+db.emps.aggregate([
+  { $match: { contrato: { $exists: true }}},
+  { $group: {_id: { provincia: "$enderezo.provincia", contrato: "$contrato" }}},
+  { $group: {_id: "$_id.provincia", contratos: {$addToSet: "$_id.contrato"}}}
+])
+```
+
+## 56
+```mongo
+db.emps.aggregate([
+  { $match: { contrato: { $exists: true }}},
+  { $group: {_id: "$enderezo.provincia", contratos: {$push: "$contrato"} }}
+])
+```
+
+## 57
+```mongo
+db.emps.aggregate([
+  { $unwind: "$hobbies" },
+  { $group: { _id: "$hobbies", num_persoas: { $addToSet: "$_id" }, total: { $sum: 1 } } },
+  { $project: { _id: 1, num_persoas: { $size: "$num_persoas" }, total: 1 } }
+]);
+
+```
